@@ -1,11 +1,10 @@
-
 module.exports = {
     /**
-     * 根据url获取对应的模板
-     * @param {*} pageMap 
-     * @param {*} path 
+     * 根据url获取对应的mock配置
+     * @param {*} pageMap
+     * @param {*} path
      */
-    getMockTemplate(pageMap, path) {
+    getUrlAllConfig(pageMap, path) {
         let page = pageMap[path];
         if (!page) {
             for (let key in pageMap) {
@@ -23,5 +22,26 @@ module.exports = {
         }
 
         return page;
-    }
+    },
+    // 根据请求方法获取对应的mock配置
+    getMockTemplate(configArr, requestMethod) {
+
+        let mockTemplate,
+            commonMockTemplate
+
+        // 后定义的模板会覆盖先定义的模板
+        // 指定请求方式的模板优先级大于通用的模板
+        for (let i = 0; i < configArr.length; ++i) {
+            let config = configArr[i]
+            let {template, method} = config
+            let isSameMethod = requestMethod.toLowerCase() === method.toLowerCase(),
+                isCommonMethod = method === 'any'
+            if (isSameMethod) {
+                mockTemplate = template
+            } else if (isCommonMethod) {
+                commonMockTemplate = template
+            }
+        }
+        return mockTemplate || commonMockTemplate
+    },
 };

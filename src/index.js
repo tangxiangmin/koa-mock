@@ -1,15 +1,26 @@
 let Mock = require('./mock')
 let util = require('./util')
 
-module.exports = function () {
+
+let middleware = function () {
     return async function (ctx, next) {
-        let url = ctx.url;
-        let template = util.getMockTemplate(Mock._urls, url);
-        data = template ? Mock.mock(template): null
+        let url = ctx.url,
+            allConfig = util.getUrlAllConfig(Mock._urls, url),
+            data
+
+        if (Array.isArray(allConfig)) {
+            let template = util.getMockTemplate(allConfig, ctx.method)
+            data = template ? Mock.mock(template) : null
+        }
+
         if (data) {
             ctx.body = data
         } else {
-            await next();
+            await next()
         }
-    };
-};
+    }
+}
+
+middleware.Mock = Mock
+
+module.exports = middleware

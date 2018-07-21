@@ -1,5 +1,5 @@
 node_modules/
 .idea/
 .vscode/
-koa-mock-*
+shymean-koa-mock-*
 package-lock.json
