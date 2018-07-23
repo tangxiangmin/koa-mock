@@ -16,18 +16,35 @@ Mock.mock = function () {
     let method,
         template
 
+    let config = {}
     if (len === 2) {
         template = args[1]
         method = 'any'
     } else if (len === 3) {
         method = args[1]
         template = args[2]
-    }
 
-    let config = {
+        if (method instanceof Object) {
+            let {type, param} = method
+            if (type === 'jsonp') {
+                method = 'get'
+                config.jsonpCallBack = param
+            } else if (type === 'file') {
+                method = 'get'
+                config.fileUrl = param
+            }
+        }
+
+        // 处理 jsonp 快捷方式
+        if (method === 'jsonp') {
+            method = 'get'
+            config.jsonpCallBack = 'callback'
+        }
+    }
+    Object.assign(config, {
         method,
         template
-    }
+    })
 
     if (!Mock._urls[url]) {
         Mock._urls[url] = []
