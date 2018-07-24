@@ -1,52 +1,40 @@
-let Mock = require('./mock')
 let fs = require('fs')
+let url = require('url')
+
+let Mock = require('./mock')
 
 module.exports = {
-    /**
-     * 根据url获取对应的mock配置
-     * @param {*} pageMap
-     * @param {*} path
-     */
-    getUrlAllConfig(pageMap, path) {
-        let page = pageMap[path];
-        if (!page) {
-            for (let key in pageMap) {
-                if (pageMap.hasOwnProperty(key)) {
-                    // key = key.replace(/\\/g, '')
-                    let re = new RegExp(`^${key}$`);
-                    if (re.test(path)) {
-                        page = pageMap[key];
-                        break;
-                    } else {
-                        console.log("=====not match=====");
-                    }
-                }
-            }
-        }
-
-        return page;
+    formatUrl(originUrl) {
+        return url.parse(originUrl).pathname
     },
-    // 根据请求方法获取对应的mock配置
-    getMockConfig(configArr, requestMethod) {
-        let mockConfig,
-            commonMockConfig
 
-        // 后定义的模板会覆盖先定义的模板
-        for (let i = 0; i < configArr.length; ++i) {
-            let config = configArr[i]
-            let {method} = config
-            let isSameMethod = requestMethod.toLowerCase() === method.toLowerCase(),
-                isCommonMethod = method === 'any'
-
-            if (isSameMethod) {
-                mockConfig = config
-            } else if (isCommonMethod) {
-                commonMockConfig = config
-            }
+    match(expected, actual = '') {
+        if (typeof expected === 'string') {
+            return expected.toLowerCase() === actual.toLowerCase()
         }
 
-        // 指定请求方式的模板优先级大于通用的模板
-        return mockConfig || commonMockConfig
+        if (expected instanceof RegExp) {
+            return expected.test(actual)
+        }
+    },
+
+    /**
+     *
+     * @param pageMap Mock.mock收集的数据
+     * @param url 请求url
+     * @param method 请求方法
+     * @return {*} mock配置对象
+     */
+    getUrlConfig(pageMap, url, method) {
+        for (let i = 0, len = pageMap.length; i < len; ++i) {
+            let item = pageMap[i]
+            if (
+                (!item.rurl || this.match(item.rurl, url)) &&
+                (!item.method || this.match(item.method, method))
+            ) {
+                return item
+            }
+        }
     },
     getMockData(config) {
         let {template, jsonpCallBack, fileUrl} = config

@@ -6,12 +6,12 @@ let Mock = require("mockjs");
 
 let mock = Mock.mock
 
-Mock._urls = {}
+Mock._urls = []
 
 Mock.mock = function () {
     let args = arguments
     let len = args.length
-    let url = args[0]
+    let rurl = args[0]
 
     let method,
         template
@@ -19,7 +19,7 @@ Mock.mock = function () {
     let config = {}
     if (len === 2) {
         template = args[1]
-        method = 'any'
+        method = ''
     } else if (len === 3) {
         method = args[1]
         template = args[2]
@@ -42,16 +42,12 @@ Mock.mock = function () {
         }
     }
     Object.assign(config, {
+        rurl,
         method,
         template
     })
 
-    if (!Mock._urls[url]) {
-        Mock._urls[url] = []
-    }
-
-    Mock._urls[url].push(config)
-
+    Mock._urls.push(config)
 
     return mock.apply(Mock, args)
 }
