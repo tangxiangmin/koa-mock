@@ -82,6 +82,18 @@ app.use(mock())
 ```
 此时访问对应的模板url，就会自动返回对应的mock数据，跟浏览器中自动拦截rurl对应的请求类似。
 
+### 自定义url请求匹配
+有时候某个相同的url请求，根据业务参数需要返回不同的模拟数据，因此提供了自定义匹配请求url的功能，需要在模板文件中实现`Mock.parseUrl`方法即可，
+该方法返回一个用于匹配的rurl
+```js
+Mock.parseUrl = function(ctx){
+    // ctx为koa上下文对象
+    return 'someUrl'
+}
+
+Mock.mock('someUrl', {code: 0})
+```
+
 ### 在浏览器中使用
 由于没有对mock模板进行注入，因此即使是在浏览器环境中使用同一套模板也是十分方便的
 

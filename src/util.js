@@ -4,8 +4,13 @@ let url = require('url')
 let Mock = require('./mock')
 
 module.exports = {
-    formatUrl(originUrl) {
-        return url.parse(originUrl).pathname
+    formatUrl(ctx) {
+        // 通过实现parseUrl自定义拦截配置
+        if (typeof Mock.parseUrl === 'function') {
+            return Mock.parseUrl(ctx)
+        } else {
+            return url.parse(ctx.url).pathname
+        }
     },
 
     match(expected, actual = '') {

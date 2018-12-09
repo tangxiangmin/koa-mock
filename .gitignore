@@ -3,3 +3,4 @@ node_modules/
 .vscode/
 shymean-koa-mock-*
 package-lock.json
+coverage
